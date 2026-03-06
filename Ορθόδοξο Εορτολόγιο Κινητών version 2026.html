@@ -1,0 +1,357 @@
+<!-- 
+Ορθόδοξο Εορτολόγιο Κινητών
+-----------------------
+
+// Το παρόν εορτολόγιο υλοποιεί βασικές κινητές εορτές
+// με εκπαιδευτικό χαρακτήρα και απλοποιημένη λογική.
+
+Δημιουργήθηκε από: [Βοσνάκης Δημήτριος]
+Έτος: 2026
+Διανέμεται δωρεάν για προσωπική και μη εμπορική χρήση.
+
+Άδεια Χρήσης:
+- Το έργο μπορεί να χρησιμοποιηθεί, τροποποιηθεί ή αναπαραχθεί ελεύθερα για μη εμπορικούς σκοπούς.
+- Απαγορεύεται η πώληση η διανομή του ως εμπορικό προϊόν χωρίς τη συγκατάθεση του δημιουργού.
+
+Για οποιαδήποτε ερώτηση, επικοινωνήστε στο: [dhmhtrhs150@gmail.com]
+
+© 2026 Ορθόδοξο Κινητό Εορτολόγιο
+-->
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<title>Ορθόδοξο Εορτολόγιο Κινητών</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root{
+  --bg:#f4f6f8;
+  --card:#ffffff;
+  --text:#222;
+  --accent:#5b1f1f;
+  --important:#b30000;
+}
+body.dark{
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#eaeaea;
+  --accent:#d4a373;
+  --important:#ff6b6b;
+}
+body{
+  margin:0;
+  font-family:Segoe UI,Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+.container{
+  max-width:1200px;
+  margin:30px auto;
+  padding:20px;
+}
+header{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+h1{
+  color:var(--accent);
+}
+.controls{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+input,button{
+  width: 6.5rem;      /* ιδανικό για 4 ψηφία */
+  padding: 0.3rem;
+  padding:10px 14px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  font-size:15px;
+}
+button{
+  cursor:pointer;
+  background:var(--accent);
+  color:white;
+  border:none;
+}
+button.secondary{
+  background:#555;
+}
+.section{
+  margin-top:35px;
+}
+.section h2{
+  border-bottom:2px solid var(--accent);
+  padding-bottom:5px;
+}
+.calendar{
+  margin-top:20px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:15px;
+}
+.card{
+  background:var(--card);
+  border-radius:10px;
+  padding:14px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.08);
+}
+.card.important{
+  border-left:5px solid var(--important);
+}
+.card .date{
+  font-weight:600;
+}
+.card .title{
+  margin-top:6px;
+}
+.instructions {
+  margin: 20px 0;
+  padding: 15px;
+  background: var(--card);
+  border-left: 4px solid var(--accent);
+  border-radius: 6px;
+}
+.instructions h2 {
+  margin-top: 0;
+  font-size: 18px;
+}
+footer{
+  text-align:center;
+  margin:40px 0 10px;
+  font-size:14px;
+  opacity:0.7;
+}
+@media print{
+  body{background:white;}
+  button,input{display:none;}
+  #instructions {
+    display: none !important;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>Ορθόδοξο Εορτολόγιο Κινητών</h1>
+  <div class="controls">
+    <input type="number" id="yearInput">
+    <button onclick="calculateForInputYear()">Υπολόγισε</button>
+    <button class="secondary" onclick="toggleDark()">Dark mode</button>
+    <button class="secondary" onclick="exportPDF()">Εκτύπωση</button>
+  </div>
+  <section id="instructions">
+  <h2>Οδηγίες Χρήσης</h2>
+  <p>
+    Στο πεδίο εισαγωγής έτους πληκτρολογήστε το έτος που επιθυμείτε και
+    πατήστε το κουμπί υπολογισμού. Το ημερολόγιο ενημερώνεται αυτόματα
+    και όλες οι κινητές εορτές προσαρμόζονται στο επιλεγμένο έτος,
+    σύμφωνα με το Ορθόδοξο Πασχάλιο.
+  </p>
+</section>
+</header>
+
+<div id="calendarContainer"></div>
+
+<footer>
+© 2026 – Δημήτριος Βοσνάκης • Προσωπικό & εκπαιδευτικό project που μπορεί να περιέχει λάθη. «Το εορτολόγιο περιλαμβάνει βασικές κινητές εορτές και δεν αντικαθιστά επίσημο εκκλησιαστικό ημερολόγιο.»
+</footer>
+</div>
+
+<script>
+const monthNames=["Ιανουαρίου","Φεβρουαρίου","Μαρτίου","Απριλίου","Μαΐου","Ιουνίου","Ιουλίου","Αυγούστου","Σεπτεμβρίου","Οκτωβρίου","Νοεμβρίου","Δεκεμβρίου"];
+
+function toggleDark(){document.body.classList.toggle("dark");}
+function exportPDF(){window.print();}
+
+function orthodoxEaster(year){
+  
+ const century = Math.floor(year / 100);
+
+    // Διόρθωση για τη διαφορά με το Γρηγοριανό ημερολόγιο
+    const gregorianOffset = 10 + century - 16 - Math.floor((century - 16) / 4);
+
+    // Υπολογισμός χρυσού αριθμού (Golden Number)
+    const goldenNumber = year % 19;
+
+    // Υπολογισμός κύκλου φάσεων της σελήνης
+    const lunarCycle = (19 * goldenNumber + 15) % 30;
+
+    // Υπολογισμός ημέρας της εβδομάδας για το Πάσχα
+    const weekdayOffset = (year + Math.floor(year / 4) + lunarCycle) % 7;
+
+    // Τελική διόρθωση για τον υπολογισμό της ημερομηνίας
+    const lunarCorrection = lunarCycle - weekdayOffset;
+
+    // Υπολογισμός ημερομηνίας του Πάσχα
+    const p = lunarCorrection + gregorianOffset;
+    const day = 1 + (p + 27 + Math.floor((p + 6) / 40)) % 31; // Ημέρα του Πάσχα
+    const month = 3 + Math.floor((p + 26) / 30);             // Μήνας του Πάσχα
+  return new Date(year,month-1,day);
+}
+
+function formatDate(d){
+  return d.getDate()+" "+monthNames[d.getMonth()];
+}
+
+function calculateCalendar(year){
+  const easter=orthodoxEaster(year);
+  const CATEGORIES = {
+  TRI: "Τριώδιο",
+  HOLY: "Μεγάλη Εβδομάδα",
+  PENT: "Διακαινήσιμος Περίοδος (Πεντηκοστάριο)",
+  OTHER:"Άλλες Κινητές Γιορτές",
+  LES:"Κινητές Γιορτές της Λέσβου"
+};
+
+
+  const feasts=[
+    //Πριν το Πάσχα.
+    {name:"Κυριακή Τελωνού και Φαρισαίου (Αρχή Τριωδίου).",offset:-70,category:CATEGORIES.TRI},
+    {name:"Κυριακή του Ασώτου.",offset:-63,category:CATEGORIES.TRI},
+    {name:"Τσικνοπέμπτη.",offset:-59,category:CATEGORIES.TRI},
+    {name:"Ψυχοσάββατο.",offset:-57,category:CATEGORIES.TRI},
+    {name:"Κυριακή των Απόκρεω.",offset:-56,category:CATEGORIES.TRI},
+    {name:"Κυριακή ευδομάδα Της Τυροφάγου (Κατάλυση Τύρου).",offset:-49,category:CATEGORIES.TRI},
+    {name:"Καθαρά Δευτέρα (Νηστεία).",offset:-48,important:true,category:CATEGORIES.TRI},
+    {name:"Α' Χαιρετισμοί (Νηστεία).",offset:-44,important:true,category:CATEGORIES.TRI},
+    {name:"Θεοδώρου Τήρωνος (Κατάλυση οίνου και ελαίου).",offset:-43,category:CATEGORIES.TRI},
+    {name:"Α' Νηστειών - Κυριακή της ορθοδοξίας (Κατάλυση οίνου και ελαίου).",offset:-42,category:CATEGORIES.TRI},
+    {name:"Β' Χαιρετισμοί (Νηστεία).",offset:-37,important:true,category:CATEGORIES.TRI},
+    {name:"Β΄ Κυριακή των Νηστειών – Γρηγορίου του Παλαμά (Κατάλυση οίνου και ελαίου).",offset:-35,category:CATEGORIES.TRI},
+    {name:"Γ' Χαιρετισμοί (Νηστεία).",offset:-30,important:true,category:CATEGORIES.TRI},
+    {name:"Γ΄ Κυριακή των Νηστειών - Σταυροπροσκυνήσεως (Κατάλυση οίνου και ελαίου).",offset:-28,category:CATEGORIES.TRI},
+    {name:"Δ' Χαιρετισμοί (Νηστεία).",offset:-23,important:true,category:CATEGORIES.TRI},
+    {name:"Δ' Κυριακή των Νηστειών. Ιωάννου της Κλίμακος (Κατάλυση οίνου και ελαίου).",offset:-21,category:CATEGORIES.TRI},
+    {name:"Ο Μεγάλος Κανών (Νηστεία).",offset:-18,category:CATEGORIES.TRI},
+    {name:"Ο Ακάθιστος Ύμνος (Κατάλυση οίνου και ελαίου).",offset:-16,category: CATEGORIES.TRI},
+    {name:"Ε' Κυριακή των νηστειών. Οσίας Μαρίας της Αιγυπτίας (Κατάλυση οίνου και ελαίου).",offset:-14,category:CATEGORIES.TRI},
+    {name:"Σάββατο Ανάστασης του Λαζάρου.",offset:-8,category: CATEGORIES.TRI},
+    {name:"Κυριακή των Βαΐων.",offset:-7,important:true,category:CATEGORIES.TRI},
+    //Μεγάλη Εβδομάδα.
+    {name:"ΜΕΓΆΛΗ ΔΕΥΤΕΡΑ: Ιωσήφ του Παγκάλου (Νηστεία).",offset:-6,important:true,category:CATEGORIES.HOLY},
+    {name:"ΜΕΓΑΛΗ ΤΡΙΤΗ: Η ανάμνηση των Δέκα Παρθένων και το τροπάριο της Κασσιανής.",offset:-5,important:true,category:CATEGORIES.HOLY},
+    {name:"ΜΕΓΑΛΗ ΤΕΤΑΡΤΗ: Της αλειψάσης τον Κύριον μύρω (Νηστεία).",offset:-4,important:true,category:CATEGORIES.HOLY},
+    {name:"ΜΕΓΑΛΗ ΠΕΜΠΤΗ: Ο Μυστικός Δείπνος (Νηστεία).",offset:-3,important:true,category:CATEGORIES.HOLY},
+    {name:"ΜΕΓΑΛΗ ΠΑΡΑΣΚΕΥΗ: Η Σταύρωσης και ο Επιτάφιος (Νηστεία).",offset:-2,important:true,category:CATEGORIES.HOLY},
+    {name:"ΜΕΓΑ ΣΑΒΒΑΤΟΝ: Η εις Άδου κάθοδος του Κυρίου (Νηστεία).",offset:-1,important:true,category:CATEGORIES.HOLY},
+    //Πεντηκοστάριο
+    {name:" ΤΟ ΑΓΙΟΝ ΠΑΣΧΑ: Η ΑΝΑΣΤΑΣΙΣ ΤΟΥ ΚΥΡΙΟΥ.",offset:0,important:true,category:CATEGORIES.PENT},
+    {name:"Δευτέρα Διακαινησίμου (Λαμπροδευτέρα).",offset:1,important:true,category:CATEGORIES.PENT},
+    {name:"Τρίτη Διακαινησίμου (Λαμπροτρίτη).",offset:2,category:CATEGORIES.PENT},
+    {name:"Ζωοδόχου Πηγής.",offset:5,category:CATEGORIES.PENT},
+    {name:"Κυριακή του Θωμά.",offset:7,category:CATEGORIES.PENT},
+    {name:"Κυριακή των Μυροφόρων.",offset:14,category:CATEGORIES.PENT},
+    {name:"Κυριακή του Παραλύτου.",offset:21,category:CATEGORIES.PENT},
+    {name:"Της Μεσοπεντηκοστής (Κατάλυση Ιχθύος).",offset:24,category:CATEGORIES.PENT},
+    {name:"Κυριακή της Σαμαρείτιδος.",offset:28,category:CATEGORIES.PENT},
+    {name:"Κυριακή του Τυφλού.",offset:35,category:CATEGORIES.PENT},
+    {name:"Της Αναλήψεως.",offset:39,category:CATEGORIES.PENT},
+    {name:"Η μνήμη των 318 Αγίων Πατέρων.",offset:42,category:CATEGORIES.PENT},
+    {name:" Σάββατο των Ψυχών.",offset:48,category:CATEGORIES.PENT},
+    {name:"Πεντηκοστή.",offset:49,category:CATEGORIES.PENT},
+    {name:"Αγίου Πνεύματος.",offset:50,important:true,category:CATEGORIES.PENT},
+    {name:"Κυριακή Αγίων Πάντων.",offset:56,category:CATEGORIES.PENT},
+    //Αλλες Κινητές Γιορτές
+    {name:"Άγιοι Ραφαήλ, Νικόλαος και Ειρήνη (Λέσβου).",offset:2,category:CATEGORIES.LES},
+    {name:"Εορτή του Ταξιάρχη Μανταμάδου.",offset:14,category:CATEGORIES.LES}
+
+  ];
+
+  const sections={
+    "Τριώδιο":[],
+    "Μεγάλη Εβδομάδα":[],
+    "Διακαινήσιμος Περίοδος (Πεντηκοστάριο)":[],
+    "Άλλες Κινητές Γιορτές":[],
+    "Κινητές Γιορτές της Λέσβου":[]
+    
+  };
+
+  function saintGeorge(year) {
+  const easter = orthodoxEaster(year);
+
+  const greatMonday = new Date(easter);
+  greatMonday.setDate(easter.getDate() - 6);
+
+  const saintGeorgeDate = new Date(year, 3, 23);
+
+  if (saintGeorgeDate >= greatMonday && saintGeorgeDate < easter) {
+    const movedDate = new Date(easter);
+    movedDate.setDate(easter.getDate() + 1); // Δευτέρα Διακαινησίμου
+    return movedDate;
+  }
+
+  return saintGeorgeDate;
+}
+
+  feasts.forEach(f => {
+  const d = new Date(easter);
+  d.setDate(easter.getDate() + f.offset);
+
+  const card = {
+    date: formatDate(d),
+    title: f.name,
+    important: f.important
+  };
+
+  if (sections[f.category]) {
+    sections[f.category].push(card);
+  }
+});
+
+// Αγίου Γεωργίου του Τροπαιοφόρου
+const sgDate = saintGeorge(year);
+
+sections[CATEGORIES.OTHER].push({
+  date: formatDate(sgDate),
+  title: "Αγίου Γεωργίου του Τροπαιοφόρου",
+  important: true
+});
+  render(sections);
+}
+
+function render(sections){
+  const container=document.getElementById("calendarContainer");
+  container.innerHTML="";
+  for(const sec in sections){
+    const s=document.createElement("div");
+    s.className="section";
+    s.innerHTML="<h2>"+sec+"</h2>";
+    const grid=document.createElement("div");
+    grid.className="calendar";
+    sections[sec].forEach(c=>{
+      const div=document.createElement("div");
+      div.className="card"+(c.important?" important":"");
+      div.innerHTML=`<div class="date">${c.date}</div><div class="title">${c.title}</div>`;
+      grid.appendChild(div);
+    });
+    s.appendChild(grid);
+    container.appendChild(s);
+  }
+  
+}
+
+function calculateForInputYear(){
+  const y=parseInt(document.getElementById("yearInput").value)||new Date().getFullYear();
+  calculateCalendar(y);
+}
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const currentYear = new Date().getFullYear();
+  const yearInput = document.getElementById("yearInput");
+
+  yearInput.value = currentYear;
+  calculateCalendar(currentYear);
+  // εδώ μέσα ΟΛΟΣ ο κώδικας που ακουμπάει DOM
+});
+</script>
+</body>
+</html>
