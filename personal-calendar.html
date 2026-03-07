@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Προσωπικό Ψηφιακό Ημερολόγιο App</title>
+
+  <!-- Mobile friendly -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <main class="app">
+
+    
+    <header class="app-header">
+      <div class="name">
+      <h1>Προσωπικό Ψηφιακό Ημερολόγιο</h1></div>
+      <div class="manual">Επιλέξτε ημερομηνία, γράψτε το γεγονός και πατήστε Αποθήκευση.
+Υποστηρίζονται Import / Export JSON και Dark Mode.</div><p></p>
+      <div class="controls">
+        <select id="yearSelect"></select>
+        <select id="monthSelect"></select>
+       <input type="file" id="importFile" style="display:none" /> <!-- κρυφό input για import -->
+        <button id="importBtn">Εισαγωγή JSON</button>
+        <button id="exportBtn">Εξαγωγή  JSON</button>
+        <button id="toggleTheme">🌙</button>
+      </div>
+    </header>
+
+    <section class="calendar">
+      <div class="weekdays">
+        <span>Δε</span><span>Τρ</span><span>Τε</span>
+        <span>Πε</span><span>Πα</span><span>Σα</span><span>Κυ</span>
+      </div>
+
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </section>
+
+   <section id="result" class="result">
+  <p id="selectedDateText">Επίλεξε ημερομηνία</p>
+
+  <textarea
+  id="eventInput"
+  rows="10"
+  placeholder="Προσθήκη γεγονότος..."
+  disabled
+></textarea>
+
+  <button id="saveEventBtn" disabled>Αποθήκευση</button>
+</section>
+<footer>
+© 2026 – Δημήτριος Βοσνάκης • Προσωπικό Ψηφιακό Ημερολόγιο • Απλό • Offline • Χωρίς εγγραφή. Ένα απλό ψηφιακό ημερολόγιο για καθημερινές σημειώσεις και γεγονότα.  Όλα τα δεδομένα αποθηκεύονται τοπικά στη συσκευή σας.
+</footer>
+  <script src="js/app.js"defer>
+    
+  </script>
+</body>
+</html>
